@@ -23,8 +23,8 @@ Puppet::Type.type(:rabbitmq_exchange).provide(:rabbitmqadmin) do
   end
 
   def self.all_vhosts
-    vhosts = []
-    parse_command(rabbitmqctl('list_vhosts')).collect do |vhost|
+    vhosts = []|
+    parse_command(rabbitmqctl('list_vhosts','-q')).collect do |vhost|
         vhosts.push(vhost)
     end
     vhosts
@@ -32,7 +32,7 @@ Puppet::Type.type(:rabbitmq_exchange).provide(:rabbitmqadmin) do
 
   def self.all_exchanges(vhost)
     exchanges = []
-    parse_command(rabbitmqctl('list_exchanges', '-p', vhost, 'name', 'type'))
+    parse_command(rabbitmqctl('list_exchanges', '-p', vhost, 'name', 'type', '-q'))
   end
 
   def self.parse_command(cmd_output)
@@ -41,7 +41,8 @@ Puppet::Type.type(:rabbitmq_exchange).provide(:rabbitmqadmin) do
     # while the last line is
     # ...done.
     #
-    cmd_output.split(/\n/)[1..-2]
+    #note: with -q param Listing... and ...done lines are gone
+    cmd_output.split(/\n/)[0..-1]
   end
 
   def self.instances
